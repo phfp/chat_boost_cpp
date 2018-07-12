@@ -39,7 +39,6 @@ class Conexao
 private:
 
     void OnInterfaceAdm();
-    void Teste(ClientePtr cliente);
     bool ValidarNickname(const string& nickname);
     void OnDisconnect(ClientePtr cliente);
     void OnNewConnection();
@@ -54,7 +53,7 @@ private:
     string LerMensagem(SocketPtr clientSock);
     string ObterData() const;
     SocketPtr GetClientSocketByNickname(const string& nickname) const;
-    ClientePtr GetClientByNickname(const string& nickname) const;
+    ClientePtr ObterClientePorNickname(const string& nickname) const;
 
     io_service          ios;
     tcp::acceptor       acceptor;

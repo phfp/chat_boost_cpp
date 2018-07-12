@@ -17,8 +17,8 @@ void Chat::Autenticacao()
     }
 }
 
-void Chat::InciciarChat(){
-
+void Chat::InciciarChat()
+{
     std::system("clear");
 
     if(conexao->Autenticado())
@@ -58,7 +58,8 @@ void Chat::Conversa()
     }
 }
 
-void Chat::TerminarChat(){
+void Chat::TerminarChat()
+{
     conexao->Sair();
     exit(1);
 }

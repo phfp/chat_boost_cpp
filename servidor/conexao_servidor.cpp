@@ -23,7 +23,8 @@ void Conexao::Iniciar()
     threads.join_all();
 }
 
-void Conexao::OnInterfaceAdm(){
+void Conexao::OnInterfaceAdm()
+{
 
     std::cout << "*--------------------COMANDOS-----------------------*" << endl
               << "[/online]                ->  Listar todos usuarios"    << endl
@@ -51,10 +52,19 @@ void Conexao::OnInterfaceAdm(){
             {
                 string nicknameSelecionado = mensagem.substr(mensagem.find(" ") + 1);
 
-                mutex.lock();
-                OnDisconnect(GetClientByNickname(nicknameSelecionado));
-                mutex.unlock();
+                if(ObterClientePorNickname(nicknameSelecionado) == nullptr)
+                {
+                    cout << "O usuário não está na lista!" << endl;
+                }
+                else
+                {
+                    mutex.lock();
+                    OnDisconnect(ObterClientePorNickname(nicknameSelecionado));
+                    mutex.unlock();
+                }
             }
+            else
+                cout << "Comando nao reconhecido!" << endl;
         }
 
         mensagem.clear();
@@ -63,7 +73,7 @@ void Conexao::OnInterfaceAdm(){
     }
 }
 
-ClientePtr Conexao::GetClientByNickname(const string &nickname) const
+ClientePtr Conexao::ObterClientePorNickname(const string &nickname) const
 {
     for(ClientePtr& client : *clientList)
     {
@@ -85,14 +95,10 @@ bool Conexao::ValidarNickname(const string &nickname)
     return (it == clientList->end()) ? true : false;
 }
 
-void Conexao::Teste(ClientePtr client)
-{
-    cout << client->nickname << endl;
-}
-
 void Conexao::OnDisconnect(ClientePtr client)
 {
-    auto position = find_if(clientList->begin(), clientList->end(), [client] (const ClientePtr c){
+    auto position = find_if(clientList->begin(), clientList->end(), [client] (const ClientePtr c)
+    {
         return c->nickname == client->nickname;
     });
 
@@ -339,7 +345,6 @@ SocketPtr Conexao::GetClientSocketByNickname(const string &nickname) const
         if(client->nickname == nickname)
             return client->socket;
     }
-
     return nullptr;
 }
 
