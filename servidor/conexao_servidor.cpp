@@ -14,12 +14,63 @@ void Conexao::Iniciar()
 {
     boost::thread_group threads;
 
+    threads.create_thread(boost::bind(&Conexao::OnInterfaceAdm, this));
     threads.create_thread(boost::bind(&Conexao::Ping, this));
     threads.create_thread(boost::bind(&Conexao::OnNewConnection, this));
     threads.create_thread(boost::bind(&Conexao::OnRequest, this));
     threads.create_thread(boost::bind(&Conexao::OnResponse, this));
     threads.create_thread(boost::bind(&Conexao::OnLogWrite, this));
     threads.join_all();
+}
+
+void Conexao::OnInterfaceAdm(){
+
+    std::cout << "*--------------------COMANDOS-----------------------*" << endl
+              << "[/online]                ->  Listar todos usuarios"    << endl
+              << "[/desconectar: usuario]  ->  Desconectar usuário"      << endl << endl;
+
+    while(true)
+    {
+        char inputBuffer[1024] = {0};
+        std::cin.getline(inputBuffer, 1024);
+        std::string mensagem(inputBuffer);
+
+        if(!mensagem.empty())
+        {
+            if(mensagem.find("/online") != string::npos)
+            {
+                string onlineUsersMsg("\n");
+
+                for(ClientePtr& client : *clientList)
+                {
+                    cout << client->nickname << endl;
+                }
+
+            }
+            else if(mensagem.find("/desconectar") != string::npos)
+            {
+                string nicknameSelecionado = mensagem.substr(mensagem.find(" ") + 1);
+
+                mutex.lock();
+                OnDisconnect(GetClientByNickname(nicknameSelecionado));
+                mutex.unlock();
+            }
+        }
+
+        mensagem.clear();
+        memset(inputBuffer, 0, 1024);
+        boost::this_thread::sleep(boost::posix_time::millisec(100));
+    }
+}
+
+ClientePtr Conexao::GetClientByNickname(const string &nickname) const
+{
+    for(ClientePtr& client : *clientList)
+    {
+        if(client->nickname == nickname)
+            return client;
+    }
+    return nullptr;
 }
 
 bool Conexao::ValidarNickname(const string &nickname)

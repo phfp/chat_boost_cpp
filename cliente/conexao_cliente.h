@@ -24,10 +24,10 @@ private:
     boost::asio::io_service     ios;
     tcp::endpoint               endpoint;
     boost::mutex                mutex;
-
     void OuvirNovasMensagens();
 
 public:
+    void Ping();
     Conexao();
     bool Autentincar(const string &nickname);
     void Iniciar();

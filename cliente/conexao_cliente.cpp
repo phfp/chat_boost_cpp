@@ -48,12 +48,35 @@ bool Conexao::Autentincar(const std::string &nickname)
     return false;
 }
 
-void Conexao::Iniciar(){
-    boost::thread OuvirMensagemTrd(boost::bind(&Conexao::OuvirNovasMensagens, this));
-    OuvirMensagemTrd.join();
+void Conexao::Ping()
+{
+    while(true)
+    {
+        boost::system::error_code erro;
+        socket->write_some(boost::asio::buffer("",1), erro);
+
+         if(erro){
+            cout << "Voce foi desconectado!" << endl;
+            Sair();
+            exit(1);
+        }
+
+        boost::this_thread::sleep(boost::posix_time::millisec(1000));
+    }
 }
 
-void Conexao::Sair(){
+void Conexao::Iniciar()
+{
+
+    boost::thread_group threads;
+
+    threads.create_thread(boost::bind(&Conexao::OuvirNovasMensagens, this));
+    threads.create_thread(boost::bind(&Conexao::Ping, this));
+    threads.join_all();
+}
+
+void Conexao::Sair()
+{
     esta_autenticado = false;
     socket->close();
 }

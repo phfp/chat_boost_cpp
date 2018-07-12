@@ -18,7 +18,7 @@ void Chat::Autenticacao()
 }
 
 void Chat::InciciarChat(){
-    
+
     std::system("clear");
 
     if(conexao->Autenticado())
@@ -33,8 +33,8 @@ void Chat::Conversa()
 {
     std::system("clear");
     std::cout << "*--------------------COMANDOS-----------------------*" << endl
-              << "[/sair]               ->  Sair do chat" << endl
-              << "[/online]             ->  Listar todos usuarios" << endl
+              << "[/sair]               ->  Sair do chat"                << endl
+              << "[/online]             ->  Listar todos usuarios"       << endl
               << "[/usuario: mensagem]  ->  Enviar uma mensagem privada" << endl << endl;
     while(true)
     {
