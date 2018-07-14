@@ -40,7 +40,7 @@ private:
 
     void OnInterfaceAdm();
     bool ValidarNickname(const string& nickname);
-    void OnDisconnect(ClientePtr cliente);
+    void OnDisconnect(ClientePtr cliente, bool queda_comunicacao);
     void OnNewConnection();
     void OnRequest();
     void OnResponse();

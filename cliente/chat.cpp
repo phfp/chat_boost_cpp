@@ -1,6 +1,7 @@
 #include "chat.h"
 #include "conexao_cliente.h"
 
+
 Chat::Chat() : conexao(new Conexao){}
 
 void Chat::Autenticacao()
@@ -46,12 +47,11 @@ void Chat::Conversa()
         {
             if(mensagem.find("/sair") != string::npos)
             {
-                conexao->EnviarMensagem(conexao->ObterNickname() + ": " + mensagem);
-                 TerminarChat();
+                TerminarChat();
             }else
                 conexao->EnviarMensagem(conexao->ObterNickname() + ": " + mensagem);
         }
-
+        
         mensagem.clear();
         memset(inputBuffer, 0, 1024);
         boost::this_thread::sleep(boost::posix_time::millisec(100));

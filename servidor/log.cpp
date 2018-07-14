@@ -21,7 +21,7 @@ void Log::SaveLog()
         WriteToFile(filaMenssagem->front());
         filaMenssagem->pop();
     }
-    mutex.unlock();
+    mutex.unlock();    
 }
 
 void Log::WriteToFile(const std::string &msg)
@@ -37,3 +37,5 @@ void Log::WriteToFile(const std::string &msg)
 
     file.close();
 }
+
+

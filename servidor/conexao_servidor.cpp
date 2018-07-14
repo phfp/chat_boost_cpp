@@ -40,8 +40,6 @@ void Conexao::OnInterfaceAdm()
         {
             if(mensagem.find("/online") != string::npos)
             {
-                string onlineUsersMsg("\n");
-
                 for(ClientePtr& client : *clientList)
                 {
                     cout << client->nickname << endl;
@@ -59,7 +57,7 @@ void Conexao::OnInterfaceAdm()
                 else
                 {
                     mutex.lock();
-                    OnDisconnect(ObterClientePorNickname(nicknameSelecionado));
+                    OnDisconnect(ObterClientePorNickname(nicknameSelecionado),false);
                     mutex.unlock();
                 }
             }
@@ -95,7 +93,7 @@ bool Conexao::ValidarNickname(const string &nickname)
     return (it == clientList->end()) ? true : false;
 }
 
-void Conexao::OnDisconnect(ClientePtr client)
+void Conexao::OnDisconnect(ClientePtr client, bool queda_comunicacao)
 {
     auto position = find_if(clientList->begin(), clientList->end(), [client] (const ClientePtr c)
     {
@@ -104,8 +102,11 @@ void Conexao::OnDisconnect(ClientePtr client)
 
     string msg = "[" + ObterData() + "] " + client->nickname + " saiu";
 
+
+    if(!queda_comunicacao){
     client->socket->shutdown(tcp::socket::shutdown_both);
     client->socket->close();
+    }
 
     clientList->erase(position);
 
@@ -120,6 +121,7 @@ void Conexao::OnNewConnection()
 {
     while(true)
     {
+
         SocketPtr clientSock(new tcp::socket(ios));
 
         acceptor.accept(*clientSock); //aceita nova conexao
@@ -230,14 +232,19 @@ void Conexao::Ping()
             for(ClientePtr &client : *clientList)
             {
                 boost::system::error_code erro;
-                client->socket->write_some(buffer("", 1), erro);
+                client->socket->write_some(buffer("", 1),erro);
 
-                if(erro){
-                    OnDisconnect(client);
+                if(erro.message() == "Broken pipe")
+                {
+                    OnDisconnect(client,true);
+                    break;
+                }
+                else if(erro){
+                    OnDisconnect(client,false);
+                    break;
                 }
             }
         }
-
         boost::this_thread::sleep(boost::posix_time::millisec(1000));
     }
 }
@@ -280,7 +287,7 @@ void Conexao::ProcessarComando(string msg, ClientePtr requisitante)
     }
     else if(msg.find("/sair") != string::npos)
     {
-        OnDisconnect(requisitante);
+        OnDisconnect(requisitante,false);
     }
     //  /from: /to: msg com espacos
     else if(msg.find("/") != string::npos && msg.find(":") != string::npos)
