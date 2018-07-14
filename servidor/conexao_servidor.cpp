@@ -103,9 +103,10 @@ void Conexao::OnDisconnect(ClientePtr client, bool queda_comunicacao)
     string msg = "[" + ObterData() + "] " + client->nickname + " saiu";
 
 
-    if(!queda_comunicacao){
-    client->socket->shutdown(tcp::socket::shutdown_both);
-    client->socket->close();
+    if(!queda_comunicacao)
+    {
+        client->socket->shutdown(tcp::socket::shutdown_both);
+        client->socket->close();
     }
 
     clientList->erase(position);

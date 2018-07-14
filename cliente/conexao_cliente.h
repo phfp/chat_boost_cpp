@@ -27,7 +27,6 @@ private:
     void OuvirNovasMensagens();
 
 public:
-    void Ping2(boost::asio::io_service ios, const char* destination);
     void Ping();
     Conexao();
     bool Autentincar(const string &nickname);
