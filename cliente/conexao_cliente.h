@@ -29,7 +29,7 @@ private:
 public:
     void Ping();
     Conexao();
-    bool Autentincar(const string &nickname);
+    bool Autentincar(const string &nickname, const string &senha);
     void Iniciar();
     void Sair();
     void EnviarMensagem(const string &mensagem);

@@ -1,4 +1,5 @@
 #include "conexao_servidor.h"
+#include "conexao_mysql.h"
 
 #define AUTH_SUCCESS "SUCESSO_RESPOSTA"
 #define INVALID_NICKNAME "NICKNAME_INVALIDO"
@@ -81,7 +82,14 @@ ClientePtr Conexao::ObterClientePorNickname(const string &nickname) const
     return nullptr;
 }
 
-bool Conexao::ValidarNickname(const string &nickname)
+
+bool Conexao::ValidarCliente (const string &nickname, const string &senha){
+    if(sql.autenticar(nickname,senha))
+        return true;
+    return false;
+}
+
+bool Conexao::VerificaSessao(const string &nickname)
 {
     auto it = find_if(clientList->begin(), clientList->end(), [nickname](const ClientePtr c)
     {
@@ -127,18 +135,30 @@ void Conexao::OnNewConnection()
 
         acceptor.accept(*clientSock); //aceita nova conexao
 
-        string name = LerMensagem(clientSock);
+        string msgCliente = LerMensagem(clientSock);
 
-        if(!ValidarNickname(name)) // Verifica validade do nickname
+        string nickname = msgCliente.substr(0, msgCliente.find_first_of("/"));
+        string senha = msgCliente.substr(msgCliente.find_last_of("/") + 1);
+
+        if(ValidarCliente(nickname, senha))
         {
-            EnviarMensagem(INVALID_NICKNAME, clientSock);
+            if(!VerificaSessao(nickname))
+            {
+                EnviarMensagem(INVALID_NICKNAME, clientSock);
+                clientSock->close();
+                continue;
+            }
+        }
+        else{
+            EnviarMensagem("SENHA_OU_USUARIO_INVALIDO", clientSock);
             clientSock->close();
             continue;
         }
 
+
         EnviarMensagem(AUTH_SUCCESS, clientSock);
 
-        string msg = "[" + ObterData() + "] " + name + " entrou no chat!\n";
+        string msg = "[" + ObterData() + "] " + nickname + " entrou no chat!\n";
 
         cout << msg;
 
@@ -147,7 +167,7 @@ void Conexao::OnNewConnection()
         log->AppendLog(msg);
 
         ClientePtr client(new Cliente);
-        client->nickname = name;
+        client->nickname = nickname;
         client->socket = clientSock;
 
         mutex.lock();
@@ -363,6 +383,3 @@ void Conexao::Broadcast(const string &msg)
         EnviarMensagem(msg, client->socket);
     }
 }
-
-
-

@@ -17,7 +17,8 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
     conexao_servidor.cpp \
-    log.cpp
+    log.cpp \
+    conexao_mysql.cpp
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -26,6 +27,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 HEADERS += \
     conexao_servidor.h \
-    log.h
+    log.h \
+    conexao_mysql.h
 
-LIBS += -L/usr/local/lib -lboost_thread -lboost_filesystem -lboost_system -lboost_date_time
+LIBS += -L/usr/local/lib -lboost_thread -lboost_filesystem -lboost_system -lboost_date_time -lmysqlcppconn

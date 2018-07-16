@@ -8,15 +8,17 @@ Conexao::Conexao(){
     endpoint = tcp::endpoint(boost::asio::ip::address::from_string("127.0.0.1"), 8001);
 }
 
-bool Conexao::Autentincar(const std::string &nickname)
+bool Conexao::Autentincar(const std::string &nickname, const std::string &senha)
 {
     try{
         this->nickname = nickname;
         socket = SocketPtr(new tcp::socket(ios));
         socket->connect(endpoint);
 
+        string msg = nickname+"/"+senha;
+
         boost::system::error_code erroEscrita;
-        socket->write_some(boost::asio::buffer(nickname, TAM_MAX_MENSSAGEM ), erroEscrita);
+        socket->write_some(boost::asio::buffer(msg, TAM_MAX_MENSSAGEM ), erroEscrita);
 
         if(erroEscrita){
             cout << "Error: " << erroEscrita.message() << "\n";
@@ -29,6 +31,11 @@ bool Conexao::Autentincar(const std::string &nickname)
 
         if(erroLeitura){
             cout << "Ocorreu um erro ao tentar autenticar.\n" << erroLeitura.message() << "\n";
+            return false;
+        }
+
+        if(strcmp(respostaServidor, "SENHA_OU_USUARIO_INVALIDO") == 0){
+            cout << "Usuário ou senha incorretos.\n";
             return false;
         }
 
@@ -109,4 +116,3 @@ void Conexao::OuvirNovasMensagens()
         boost::this_thread::sleep(boost::posix_time::millisec(100));
     }
 }
-

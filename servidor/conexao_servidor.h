@@ -1,6 +1,7 @@
 #ifndef CONEXAO_SERVIDOR_H
 #define CONEXAO_SERVIDOR_H
 
+#include "conexao_mysql.h"
 #include "log.h"
 #include <iostream>
 #include <map>
@@ -39,7 +40,8 @@ class Conexao
 private:
 
     void OnInterfaceAdm();
-    bool ValidarNickname(const string& nickname);
+    bool VerificaSessao(const string& nickname);
+    bool ValidarCliente (const string &nickname, const string &senha);
     void OnDisconnect(ClientePtr cliente, bool queda_comunicacao);
     void OnNewConnection();
     void OnRequest();
@@ -59,6 +61,7 @@ private:
     tcp::acceptor       acceptor;
     boost::mutex        mutex;
 
+    conexao_mysql       sql;
     ClientListPtr       clientList;
     ClientMsgQueuePtr   filaMensagens;
     LogPtr              log;

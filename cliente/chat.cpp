@@ -14,7 +14,10 @@ void Chat::Autenticacao()
         std::string nickname;
         std::cout << "Nickname: ";
         std::cin >> nickname;
-        autenticacao = conexao->Autentincar(nickname);
+        std::string senha;
+        std::cout << "Senha: ";
+        std::cin >> senha;
+        autenticacao = conexao->Autentincar(nickname,senha);
     }
 }
 
@@ -51,7 +54,7 @@ void Chat::Conversa()
             }else
                 conexao->EnviarMensagem(conexao->ObterNickname() + ": " + mensagem);
         }
-        
+
         mensagem.clear();
         memset(inputBuffer, 0, 1024);
         boost::this_thread::sleep(boost::posix_time::millisec(100));
